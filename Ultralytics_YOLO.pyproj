@@ -1,0 +1,74 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>fac4769b-8baf-4cab-b4ad-e2ddd710db63</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>UI\NyaYOLOStudio.py</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>Ultralytics_YOLO</Name>
+    <RootNamespace>Ultralytics_YOLO</RootNamespace>
+    <InterpreterId>Global|PythonCore|3.14</InterpreterId>
+    <TestFramework>Pytest</TestFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ConfigCreator.py" />
+    <Compile Include="Datasets\Split.py" />
+    <Compile Include="Detection\DetectionTest.py" />
+    <Compile Include="Detection\RandomTest.py" />
+    <Compile Include="SegTrain.py" />
+    <Compile Include="tools\convertToONNX.py" />
+    <Compile Include="tools\cudatorch.py" />
+    <Compile Include="tools\ConvertToLables.py" />
+    <Compile Include="tools\DataCheck.py" />
+    <Compile Include="tools\seg\ConfigCreator.py" />
+    <Compile Include="tools\seg\JSON2YOLOSeg.py" />
+    <Compile Include="UI\NyaYOLOStudio.py" />
+    <Compile Include="UI\NyaUI.py" />
+    <Compile Include="UI\styles.py" />
+    <Compile Include="UI\workers.py" />
+    <Compile Include="Ultralytics_YOLO.py" />
+    <Compile Include="DetectTrain.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Datasets\" />
+    <Folder Include="Detection\" />
+    <Folder Include="tools\" />
+    <Folder Include="tools\seg\" />
+    <Folder Include="UI\" />
+    <Folder Include="Val\" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|Astral|CPython3.11.15" />
+    <InterpreterReference Include="Global|PythonCore|3.13" />
+    <InterpreterReference Include="Global|PythonCore|3.14" />
+    <InterpreterReference Include="Global|PythonCore|3.9" />
+    <InterpreterReference Include="Global|VisualStudio|openmmlab" />
+    <InterpreterReference Include="Global|VisualStudio|PythonSoftwareFoundation.Python.3.13_3.13.3824.0_x64__qbz5n2kfra8p0" />
+    <InterpreterReference Include="Global|VisualStudio|ultralytics" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Datasets\config.yaml" />
+    <Content Include="UI\file_0000000031e8720681bd49398eace5bf.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+  <!-- Uncomment the CoreCompile target to enable the Build command in
+       Visual Studio and specify your pre- and post-build commands in
+       the BeforeBuild and AfterBuild targets below. -->
+  <!--<Target Name="CoreCompile" />-->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>

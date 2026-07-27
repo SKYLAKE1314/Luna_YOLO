@@ -1,0 +1,6 @@
+path: Z:/VisionTek/Ultralytics/Ultralytics_YOLO/Datasets
+train: train/images
+val: val/images
+nc: 1
+names:
+- '1'
