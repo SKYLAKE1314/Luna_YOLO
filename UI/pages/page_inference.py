@@ -30,6 +30,7 @@ class InferencePageWidget(QWidget):
         left_layout.addWidget(QLabel("推理與測試控制器"))
 
         form = QFormLayout()
+        form.setVerticalSpacing(8)
 
         self.infer_model_input = QLineEdit(r"runs\detect\train\weights\best.pt")
         btn_infer_model = QPushButton("選擇模型 (.pt)")

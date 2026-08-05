@@ -7,6 +7,7 @@ import cv2
 import yaml
 import torch
 import numpy as np
+import psutil
 from PySide6.QtCore import QThread, Signal
 from PySide6.QtGui import QImage, QPixmap
 from ultralytics import YOLO
@@ -365,6 +366,15 @@ class TrainWorker(QThread):
             model.add_callback("on_train_batch_end", on_train_batch_end)
             model.add_callback("on_train_epoch_end", on_train_epoch_end)
 
+            # World Detection: 設定文字類別提示
+            world_classes = self.kwargs.pop("world_classes", None)
+            if world_classes:
+                self.log_signal.emit(f"🌐 套用 World Detection 文字提示類別: {world_classes}")
+                if hasattr(model, "set_classes"):
+                    model.set_classes(world_classes)
+                else:
+                    self.log_signal.emit("[WARN] 此模型不支援 set_classes()，將以標準訓練模式繼續...")
+
             # 執行訓練
             results = model.train(**self.kwargs)
 
@@ -377,39 +387,57 @@ class TrainWorker(QThread):
             self.finished_signal.emit(False, str(e))
 
 
+
 # =========================================================
 # Worker: 推理與實時目標追蹤 (Predict & Track)
 # =========================================================
 class InferenceWorker(QThread):
     frame_signal = Signal(QImage, str) # rendered_frame, status_text
+    status_signal = Signal(str)        # status text for UI label
     log_signal = Signal(str)
     finished_signal = Signal()
 
-    def __init__(self, model_path, source, mode="predict", tracker="bytetrack.yaml", conf=0.25, iou=0.45, device="0"):
+    def __init__(self, model_path, source, mode="predict", tracker="bytetrack.yaml", conf=0.25, iou=0.45, device="0", world_classes=None):
         super().__init__()
         self.model_path = model_path
         self.source = source
-        self.mode = mode # 'predict' 或 'track'
+        self.mode = mode # 'predict', 'track', 或 'world'
         self.tracker = tracker
         self.conf = float(conf)
         self.iou = float(iou)
         self.device = device
+        self.world_classes = world_classes
         self._is_running = True
 
     def stop(self):
         self._is_running = False
 
     def run(self):
+        self.status_signal.emit("⏳ 正在啟動推理引擎與載入模型...")
         self.log_signal.emit(f"🎬 啟動 {self.mode.upper()} 推理/追蹤引擎...")
         try:
             model = YOLO(self.model_path)
             
+            # World Detection / Text Detection 類別設定
+            if self.world_classes and hasattr(model, "set_classes"):
+                self.status_signal.emit(f"🌐 設定 World 類別提示 ({', '.join(self.world_classes)})...")
+                self.log_signal.emit(f"🌐 套用 World/Text 檢測類別提示: {self.world_classes}")
+                try:
+                    model.set_classes(self.world_classes)
+                except Exception as ex:
+                    self.log_signal.emit(f"⚠️ 設定類別提示失敗 (若使用網絡預設需檢查 CLIP 快取/下載): {ex}")
+                    self.status_signal.emit(f"⚠️ 設定類別提示異常: {ex}")
+
+            self.status_signal.emit("📷 正在讀取測試媒體並執行推斷...")
+
             # 單圖或資料夾推斷
-            if isinstance(self.source, str) and (self.source.endswith(('.jpg', '.png', '.jpeg', '.bmp')) or os.path.isdir(self.source)):
+            src_lower = str(self.source).lower()
+            if isinstance(self.source, str) and (src_lower.endswith(('.jpg', '.png', '.jpeg', '.bmp', '.webp', '.tif', '.tiff')) or os.path.isdir(self.source)):
+
                 if self.mode == "track":
-                    results = model.track(source=self.source, tracker=self.tracker, conf=self.conf, iou=self.iou, device=self.device, stream=True)
+                    results = list(model.track(source=self.source, tracker=self.tracker, conf=self.conf, iou=self.iou, device=self.device, stream=True))
                 else:
-                    results = model.predict(source=self.source, conf=self.conf, iou=self.iou, device=self.device, stream=True)
+                    results = list(model.predict(source=self.source, conf=self.conf, iou=self.iou, device=self.device, stream=True))
 
                 for res in results:
                     if not self._is_running:
@@ -417,10 +445,11 @@ class InferenceWorker(QThread):
                     frame_bgr = res.plot()
                     qimg = self._cv_to_qimage(frame_bgr)
                     det_count = len(res.boxes) if res.boxes is not None else 0
-                    info = f"檢測目標數: {det_count}"
+                    info = f"✅ 檢測完成 | 檢測目標數: {det_count}"
                     if res.boxes is not None and res.boxes.id is not None:
                         info += f" | 追蹤ID數: {len(res.boxes.id)}"
                     self.frame_signal.emit(qimg, info)
+                    self.status_signal.emit(info)
                     time.sleep(0.03)
 
             # 影片或相機串流
@@ -428,7 +457,9 @@ class InferenceWorker(QThread):
                 cap_src = 0 if str(self.source) == "0" else self.source
                 cap = cv2.VideoCapture(cap_src)
                 if not cap.isOpened():
-                    self.log_signal.emit(f"❌ 無法開啟影像來源: {self.source}")
+                    msg = f"❌ 無法開啟影像來源: {self.source}"
+                    self.log_signal.emit(msg)
+                    self.status_signal.emit(msg)
                     return
 
                 fps_start_time = time.time()
@@ -454,6 +485,7 @@ class InferenceWorker(QThread):
                     info = f"FPS: {fps:.1f} | 檢測目標: {det_count}"
 
                     self.frame_signal.emit(qimg, info)
+                    self.status_signal.emit(info)
                     time.sleep(0.01)
 
                 cap.release()
@@ -462,7 +494,9 @@ class InferenceWorker(QThread):
             self.finished_signal.emit()
 
         except Exception as e:
-            self.log_signal.emit(f"❌ 推理過程出錯: {e}")
+            err_msg = f"❌ 推理過程出錯: {e}"
+            self.log_signal.emit(err_msg)
+            self.status_signal.emit(err_msg)
             self.finished_signal.emit()
 
     def _cv_to_qimage(self, cv_img):
@@ -524,3 +558,73 @@ class CudaCheckWorker(QThread):
             "cuda_version": torch.version.cuda if torch.cuda.is_available() else "N/A"
         }
         self.info_signal.emit(info)
+
+
+# =========================================================
+# Worker: 非阻塞 Task Manager 效能監控
+# =========================================================
+class PerfMonitorThread(QThread):
+    stats_signal = Signal(float, str, float, str, float, str, float, str)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._running = True
+        self.nvml_handle = None
+        try:
+            import pynvml
+            pynvml.nvmlInit()
+            if pynvml.nvmlDeviceGetCount() > 0:
+                self.nvml_handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+        except Exception:
+            self.nvml_handle = None
+
+    def run(self):
+        try:
+            psutil.cpu_percent()
+        except Exception:
+            pass
+
+        while self._running:
+            time.sleep(1.0)
+            if not self._running:
+                break
+            try:
+                cpu_pct = psutil.cpu_percent()
+                ram_mem = psutil.virtual_memory()
+                ram_pct = ram_mem.percent
+                ram_text = f"{ram_mem.used / (1024**3):.1f}/{ram_mem.total / (1024**3):.0f}G"
+
+                gpu_pct, vram_pct, vram_text = 0.0, 0.0, "0/0G"
+
+                if self.nvml_handle:
+                    try:
+                        import pynvml
+                        util = pynvml.nvmlDeviceGetUtilizationRates(self.nvml_handle)
+                        mem_info = pynvml.nvmlDeviceGetMemoryInfo(self.nvml_handle)
+                        gpu_pct = float(util.gpu)
+                        vram_pct = float((mem_info.used / mem_info.total) * 100)
+                        v_used_g = mem_info.used / (1024 ** 3)
+                        v_total_g = mem_info.total / (1024 ** 3)
+                        vram_text = f"{v_used_g:.1f}/{v_total_g:.0f}G"
+                    except Exception:
+                        pass
+                elif torch.cuda.is_available():
+                    try:
+                        allocated = torch.cuda.memory_allocated(0)
+                        total = torch.cuda.get_device_properties(0).total_memory
+                        vram_pct = (allocated / total) * 100
+                        vram_text = f"{allocated / (1024**3):.1f}/{total / (1024**3):.0f}G"
+                    except Exception:
+                        pass
+
+                self.stats_signal.emit(
+                    cpu_pct, f"{int(cpu_pct)}%",
+                    ram_pct, ram_text,
+                    gpu_pct, f"{int(gpu_pct)}%",
+                    vram_pct, vram_text
+                )
+            except Exception:
+                pass
+
+    def stop(self):
+        self._running = False

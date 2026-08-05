@@ -172,7 +172,7 @@ class TrainConfigPageWidget(QWidget):
         ds_form = QFormLayout()
         ds_form.setVerticalSpacing(12)
         ds_form.setContentsMargins(0, 5, 0, 5)
-        self.data_input = QLineEdit(os.path.join(CURRENT_DIR, "NYA", "config.yaml"))
+        self.data_input = QLineEdit(os.path.join(CURRENT_DIR, "NYA_Project", "dataset", "config.yaml"))
         btn_data_select = QPushButton("選擇 Dataset config.yaml")
         btn_data_select.clicked.connect(lambda: self._select_file(self.data_input, "選擇 config.yaml"))
         ds_form.addRow("Dataset config:", self.data_input)
@@ -195,7 +195,23 @@ class TrainConfigPageWidget(QWidget):
 
         self._refresh_local_models()
 
-        # 5. 超參數 Tabs
+        # 5. 訓練參數模板 (Presets)
+        preset_layout = QHBoxLayout()
+        preset_layout.setContentsMargins(12, 12, 12, 0)
+        preset_lbl = QLabel("🎯 預設參數模板:")
+        preset_lbl.setStyleSheet("font-weight: bold; color: #D97706;")
+        self.preset_combo = QComboBox()
+        self.preset_combo.addItems([
+            "一般目標檢測 (預設)",
+            "World / Character Tracking (文字/小目標追蹤 - 穩定防崩潰)"
+        ])
+        self.preset_combo.currentIndexChanged.connect(self._apply_training_preset)
+        preset_layout.addWidget(preset_lbl)
+        preset_layout.addWidget(self.preset_combo)
+        preset_layout.addStretch()
+        card_layout.addLayout(preset_layout)
+
+        # 6. 超參數 Tabs
         tabs = QTabWidget()
         tabs.setMinimumHeight(380)
 
@@ -252,8 +268,12 @@ class TrainConfigPageWidget(QWidget):
         self.opt_combo.addItems(["auto", "SGD", "Adam", "AdamW", "NAdam", "RAdam", "RMSProp"])
 
         self.lr0_spin = QDoubleSpinBox()
+        self.lr0_spin.setDecimals(5)
+        self.lr0_spin.setSingleStep(0.0001)
         self.lr0_spin.setValue(0.01)
         self.lrf_spin = QDoubleSpinBox()
+        self.lrf_spin.setDecimals(5)
+        self.lrf_spin.setSingleStep(0.01)
         self.lrf_spin.setValue(0.01)
 
         self.cos_lr_cb = QCheckBox("cos_lr (餘弦退火學習率)")
@@ -344,12 +364,52 @@ class TrainConfigPageWidget(QWidget):
         if file_path:
             line_edit.setText(file_path)
 
+    def _apply_training_preset(self, idx):
+        if idx == 1:
+            # World / Character Tracking
+            self.epochs_spin.setValue(200)
+            self.batch_spin.setValue(4)
+            self.imgsz_spin.setValue(640)
+            self.workers_spin.setValue(0)
+            self.pretrained_cb.setChecked(True)
+            self.amp_cb.setChecked(False)
+            
+            # Optimizer & LR
+            idx_opt = self.opt_combo.findText("AdamW")
+            if idx_opt >= 0: self.opt_combo.setCurrentIndex(idx_opt)
+            self.lr0_spin.setValue(0.0005)
+            self.lrf_spin.setValue(0.01)
+            self.cos_lr_cb.setChecked(True)
+            
+            # Loss weights
+            self.box_loss_spin.setValue(7.5)
+            self.cls_loss_spin.setValue(0.5)
+            self.dfl_loss_spin.setValue(1.5)
+        else:
+            # General Default
+            self.epochs_spin.setValue(100)
+            self.batch_spin.setValue(16)
+            self.imgsz_spin.setValue(640)
+            self.workers_spin.setValue(4)
+            self.pretrained_cb.setChecked(True)
+            self.amp_cb.setChecked(True)
+            
+            idx_opt = self.opt_combo.findText("auto")
+            if idx_opt >= 0: self.opt_combo.setCurrentIndex(idx_opt)
+            self.lr0_spin.setValue(0.01)
+            self.lrf_spin.setValue(0.01)
+            self.cos_lr_cb.setChecked(True)
+            
+            self.box_loss_spin.setValue(7.5)
+            self.cls_loss_spin.setValue(0.5)
+            self.dfl_loss_spin.setValue(1.5)
+
     def _on_start_train(self):
         kwargs = {
             "model_path": self.get_selected_model_path(),
-            "data_path": self.data_input.text().strip(),
+            "data": self.data_input.text().strip(),
             "epochs": self.epochs_spin.value(),
-            "batch_size": self.batch_spin.value(),
+            "batch": self.batch_spin.value(),
             "imgsz": self.imgsz_spin.value(),
             "device": self.device_input.text().strip(),
             "workers": self.workers_spin.value(),

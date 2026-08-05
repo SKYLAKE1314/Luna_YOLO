@@ -142,6 +142,39 @@ def show_environment_dialog(parent=None, auto_on_startup=False):
     dlg.resize(560, 420)
     dlg.setAttribute(Qt.WA_DeleteOnClose, True)
 
+    # 顯式設定對話框主題樣式 (深色主題)
+    dlg.setStyleSheet("""
+        QDialog {
+            background-color: #1E1F20;
+            color: #E3E3E3;
+        }
+        QLabel {
+            color: #E3E3E3;
+        }
+        QTextEdit {
+            background-color: #131314;
+            color: #C4C7C5;
+            border: 1px solid #444746;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Segoe UI', monospace;
+            font-size: 12px;
+            padding: 10px;
+        }
+        QPushButton {
+            background-color: #D97706;
+            color: #FFFFFF;
+            border: 2px solid #F59E0B;
+            border-radius: 16px;
+            padding: 8px 20px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        QPushButton:hover {
+            background-color: #B45309;
+            border: 2px solid #FBBF24;
+        }
+    """)
+
     layout = QVBoxLayout(dlg)
     layout.setContentsMargins(20, 20, 20, 20)
     layout.setSpacing(14)
@@ -152,7 +185,7 @@ def show_environment_dialog(parent=None, auto_on_startup=False):
     icon_lbl.setPixmap(shield_pixmap)
     
     title = QLabel("系統環境與依賴診斷報告")
-    title.setStyleSheet("font-size: 16px; font-weight: bold;")
+    title.setStyleSheet("font-size: 16px; font-weight: bold; color: #E3E3E3;")
     header_row.addWidget(icon_lbl)
     header_row.addWidget(title)
     header_row.addStretch()
@@ -160,7 +193,6 @@ def show_environment_dialog(parent=None, auto_on_startup=False):
 
     txt = QTextEdit()
     txt.setReadOnly(True)
-    txt.setStyleSheet("font-family: 'Consolas', 'Segoe UI', monospace; font-size: 12px; border-radius: 8px;")
 
     lines = []
     lines.append(f"Python 版本: {status['python_version']}")
@@ -205,7 +237,6 @@ def show_environment_dialog(parent=None, auto_on_startup=False):
 
     btn_row = QHBoxLayout()
     btn_close = QPushButton("關閉並繼續")
-    btn_close.setObjectName("GoogleAmberButton")
     btn_close.clicked.connect(dlg.accept)
     btn_row.addStretch()
     btn_row.addWidget(btn_close)

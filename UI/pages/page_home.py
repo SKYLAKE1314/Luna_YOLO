@@ -39,8 +39,8 @@ class HomePageWidget(QWidget):
         avatar_frame.setFixedSize(100, 100)
         avatar_frame.setAlignment(Qt.AlignCenter)
         avatar_frame.setStyleSheet("""
-            background-color: #FCE7CA;
-            border: 4px solid #D97706;
+            background-color: rgba(130, 80, 220, 0.15);
+            border: 3px solid rgba(130, 80, 220, 0.5);
             border-radius: 50px;
             font-size: 42px;
         """)
@@ -164,9 +164,9 @@ class HomePageWidget(QWidget):
 
         layout.addLayout(metro_grid)
 
-        footer_lbl = QLabel("本程式碼基於 Ultralytics YOLO，使用 MIT License。任何散佈和再發行務必遵循相關條款。")
+        footer_lbl = QLabel("本程式碼基於 Ultralytics YOLO，使用 MIT License授權。任何散佈和再發行務必遵循相關條款。")
         footer_lbl.setStyleSheet("font-size: 11px; text-align: center; margin-top: 15px;")
-        footer_lbl.setWordWrap(False) 
+        footer_lbl.setWordWrap(True)
         footer_lbl.setAlignment(Qt.AlignCenter)
         layout.addWidget(footer_lbl, 0, Qt.AlignCenter) 
 

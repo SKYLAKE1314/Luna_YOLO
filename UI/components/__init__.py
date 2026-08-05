@@ -3,3 +3,4 @@ from components.perf_graph import TaskManagerMiniGraph
 from components.env_dialog import check_environment_status, show_environment_dialog, create_defender_shield_icon, get_resource_path
 from components.header import GoogleHeaderWidget
 from components.sidebar import GoogleSidebarWidget
+from components.annotation_canvas import AnnotationCanvasWidget

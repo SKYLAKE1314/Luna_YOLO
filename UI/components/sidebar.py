@@ -24,13 +24,14 @@ class GoogleSidebarWidget(QWidget):
         layout.setSpacing(6)
 
         self.nav_buttons = []
+        # 導航圖標文件位置 (供替換): UI/icons/nav_home.png, nav_data.png, nav_train.png, nav_live.png, nav_infer.png, nav_export.png
         nav_items = [
-            ("🏠  首頁", 0),
-            ("📁  資料與標註轉換", 1),
-            ("⚙️  模型與訓練設定", 2),
-            ("📊  即時訓練動態", 3),
-            ("🎥  推理與目標追蹤", 4),
-            ("🚀  模型導出與診斷", 5)
+            ("首頁", 0),
+            ("資料與標註轉換", 1),
+            ("模型與訓練設定", 2),
+            ("即時訓練動態", 3),
+            ("推理與目標追蹤", 4),
+            ("模型導出與診斷", 5)
         ]
 
         for text, idx in nav_items:

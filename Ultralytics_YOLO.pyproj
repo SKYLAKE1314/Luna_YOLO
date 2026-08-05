@@ -27,6 +27,8 @@
     <Compile Include="Datasets\Split.py" />
     <Compile Include="Detection\DetectionTest.py" />
     <Compile Include="Detection\RandomTest.py" />
+    <Compile Include="Detection\textdetection.py" />
+    <Compile Include="Detection\WorldTest.py" />
     <Compile Include="SegTrain.py" />
     <Compile Include="tools\convertToONNX.py" />
     <Compile Include="tools\cudatorch.py" />
@@ -34,12 +36,28 @@
     <Compile Include="tools\DataCheck.py" />
     <Compile Include="tools\seg\ConfigCreator.py" />
     <Compile Include="tools\seg\JSON2YOLOSeg.py" />
+    <Compile Include="UI\components\annotation_canvas.py" />
+    <Compile Include="UI\components\env_dialog.py" />
+    <Compile Include="UI\components\header.py" />
+    <Compile Include="UI\components\perf_graph.py" />
+    <Compile Include="UI\components\sidebar.py" />
+    <Compile Include="UI\components\__init__.py" />
+    <Compile Include="UI\config_manager.py" />
     <Compile Include="UI\NyaYOLOStudio.py" />
     <Compile Include="UI\NyaUI.py" />
+    <Compile Include="UI\pages\page_dataprep.py" />
+    <Compile Include="UI\pages\page_export_tools.py" />
+    <Compile Include="UI\pages\page_home.py" />
+    <Compile Include="UI\pages\page_inference.py" />
+    <Compile Include="UI\pages\page_live_train.py" />
+    <Compile Include="UI\pages\page_train_config.py" />
+    <Compile Include="UI\pages\__init__.py" />
+    <Compile Include="UI\project_manager.py" />
     <Compile Include="UI\styles.py" />
     <Compile Include="UI\workers.py" />
     <Compile Include="Ultralytics_YOLO.py" />
     <Compile Include="DetectTrain.py" />
+    <Compile Include="WorldTrain.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Datasets\" />
@@ -47,6 +65,9 @@
     <Folder Include="tools\" />
     <Folder Include="tools\seg\" />
     <Folder Include="UI\" />
+    <Folder Include="UI\components\" />
+    <Folder Include="UI\icons\" />
+    <Folder Include="UI\pages\" />
     <Folder Include="Val\" />
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +82,11 @@
   <ItemGroup>
     <Content Include="Datasets\config.yaml" />
     <Content Include="UI\file_0000000031e8720681bd49398eace5bf.png" />
+    <Content Include="UI\icons\apple.png" />
+    <Content Include="UI\icons\cpu.png" />
+    <Content Include="UI\icons\nvidia.png" />
+    <Content Include="UI\icons\openvino.png" />
+    <Content Include="UI\icons\tf.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

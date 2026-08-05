@@ -66,13 +66,13 @@ class GoogleAccountTheme:
             text_s       = "#49454F"                    # 次要文字：清晰深灰
             primary      = "#6750A4"                    # 高對比主題紫
             primary_hover = "#4F378B"
-            border       = "rgba(121,116,126,0.30)"     # 輕柔層次邊框
+            border       = "rgba(121,116,126,0.30)"     # 類IOS果冻邊框
             card_bg      = "rgba(255,255,255,0.92)"     # 亮白卡片背景
             log_bg       = "rgba(244,240,248,0.95)"
             accent_bg    = "#6750A4"
             accent_text  = "#FFFFFF"
             pop_bg       = "#FFFFFF"
-            item_hover   = "rgba(232,222,248,0.60)"
+            item_hover   = "rgba(232,222,248,0.60)"     #
             input_bg     = "#FFFFFF"
             tile_bg      = "rgba(255,255,255,0.92)"
             tile_border  = "rgba(121,116,126,0.25)"
@@ -116,12 +116,13 @@ class GoogleAccountTheme:
             border-radius: 16px;
             padding: 6px 14px;
             font-size: 13px;
-            font-weight: 500;
-            color: {text_p};
+            font-weight: 600;
+            color: {primary};
         }}
 
         QPushButton#GoogleHeaderBtn:hover {{
             background-color: {item_hover};
+            color: {primary_hover};
         }}
 
         /* Google Sidebar */
@@ -156,8 +157,8 @@ class GoogleAccountTheme:
         QLineEdit#GoogleSearchBar {{
             background-color: {input_bg};
             border: 1px solid {search_border};
-            border-radius: 24px;
-            padding: 12px 20px;
+            border-radius: 20px;
+            padding: 8px 16px;
             font-size: 14px;
             color: {text_p};
         }}
@@ -255,75 +256,110 @@ class GoogleAccountTheme:
             color: {text_p};
         }}
 
-        /* QComboBox */
+        /* QComboBox & QListView 下拉清單選單 */
         QComboBox {{
             background-color: {input_bg};
             border: 1px solid {border};
             border-radius: 8px;
-            padding: 8px 12px;
+            padding: 4px 8px;
             color: {text_p};
+            font-weight: 500;
         }}
 
         QComboBox:focus {{
             border: 2px solid {primary};
         }}
 
-        QComboBox QAbstractItemView {{
+        QComboBox QAbstractItemView, QListView, QComboBox QListView {{
+            background: {pop_bg};
             background-color: {pop_bg};
             color: {text_p};
             border: 1px solid {border};
             border-radius: 8px;
             padding: 4px;
-            selection-background-color: {item_hover};
-            selection-color: {text_p};
+            selection-background-color: {active_pill};
+            selection-color: {active_pill_text};
             outline: none;
         }}
 
-        QComboBox QAbstractItemView::item {{
-            min-height: 30px;
-            padding: 6px 10px;
+        QComboBox QAbstractItemView::item, QListView::item {{
+            min-height: 32px;
+            padding: 6px 12px;
             color: {text_p};
+            background-color: {pop_bg};
             border-radius: 4px;
         }}
 
-        QComboBox QAbstractItemView::item:selected {{
-            background-color: {item_hover};
-            color: {primary};
-            font-weight: 600;
+        QComboBox QAbstractItemView::item:hover, QListView::item:hover,
+        QComboBox QAbstractItemView::item:selected, QListView::item:selected {{
+            background-color: {active_pill};
+            color: {active_pill_text};
+            font-weight: bold;
         }}
 
         /* Buttons */
-        QPushButton#GooglePrimaryButton, QPushButton#GoogleAmberButton {{
-            background-color: {accent_bg};
-            color: {accent_text};
-            border: none;
-            border-radius: 20px;
-            padding: 10px 24px;
+        QPushButton {{
+            background-color: {surface};
+            color: {primary};
+            border: 1px solid {border};
+            border-radius: 8px;
+            padding: 6px 12px;
             font-weight: 500;
-            font-size: 14px;
         }}
 
-        QPushButton#GooglePrimaryButton:hover, QPushButton#GoogleAmberButton:hover {{
+        QPushButton:hover {{
+            background-color: {item_hover};
+            color: {primary_hover};
+        }}
+
+        QPushButton#GooglePrimaryButton {{
+            background-color: {primary};
+            color: #FFFFFF;
+            border: none;
+            border-radius: 16px;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 13px;
+        }}
+
+        QPushButton#GoogleAmberButton {{
+            background-color: #E65100;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 16px;
+            padding: 8px 16px;
+            font-weight: bold;
+            font-size: 13px;
+        }}
+
+        QPushButton#GooglePrimaryButton:hover {{
             background-color: {primary_hover};
+        }}
+
+        QPushButton#GoogleAmberButton:hover {{
+            background-color: #BF360C;
         }}
         
         QPushButton#GoogleAmberButton:disabled {{
             background-color: {border};
             color: {text_s};
+            border: 1px solid {border};
         }}
 
         QPushButton#GoogleSecondaryButton {{
-            background-color: transparent;
+            background-color: {surface};
             color: {primary};
-            border: none;
-            padding: 8px 16px;
-            font-weight: 500;
+            border: 1px solid {border};
+            padding: 6px 12px;
+            font-weight: 600;
             font-size: 13px;
-            border-radius: 16px;
+            border-radius: 12px;
         }}
 
         QPushButton#GoogleSecondaryButton:hover {{
             background-color: {item_hover};
+            color: {primary_hover};
+            border-color: {primary};
         }}
 
         /* Inputs & Controls */
@@ -331,7 +367,7 @@ class GoogleAccountTheme:
             background-color: {input_bg};
             border: 1px solid {border};
             border-radius: 8px;
-            padding: 8px 12px;
+            padding: 4px 8px;
             color: {text_p};
             selection-background-color: {primary};
             selection-color: {btn_text};
@@ -394,6 +430,114 @@ class GoogleAccountTheme:
             color: {text_p};
             spacing: 8px;
             font-weight: 400;
+        }}
+
+        /* List Widget */
+        QListWidget {{
+            background-color: {input_bg};
+            color: {text_p};
+            border: 1px solid {border};
+            border-radius: 8px;
+            font-size: 12px;
+        }}
+
+        QListWidget::item {{
+            padding: 5px;
+            color: {text_p};
+        }}
+
+        QListWidget::item:selected {{
+            background-color: {active_pill};
+            color: {active_pill_text};
+            border-radius: 4px;
+        }}
+
+        /* GroupBox */
+        QGroupBox {{
+            color: {text_p};
+            border: 1px solid {border};
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+            font-weight: 500;
+        }}
+
+        QGroupBox::title {{
+            subcontrol-origin: margin;
+            padding: 0 8px;
+            color: {primary};
+        }}
+
+        /* Dialog Overrides */
+        QDialog {{
+            background-color: {card_bg};
+            color: {text_p};
+        }}
+
+        QMessageBox {{
+            background-color: {card_bg};
+            color: {text_p};
+        }}
+
+        QMessageBox QLabel {{
+            color: {text_p};
+        }}
+
+        QInputDialog {{
+            background-color: {card_bg};
+            color: {text_p};
+        }}
+
+        /* ScrollArea */
+        QScrollArea {{
+            background-color: transparent;
+            border: none;
+        }}
+
+        QWidget#CardScrollContent {{
+            background-color: transparent;
+        }}
+
+        QScrollBar:vertical {{
+            background: transparent;
+            width: 8px;
+            border-radius: 4px;
+        }}
+
+        QScrollBar::handle:vertical {{
+            background: {border};
+            border-radius: 4px;
+            min-height: 20px;
+        }}
+
+        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
+            height: 0px;
+        }}
+
+        /* Menu */
+        QMenu {{
+            background-color: {pop_bg};
+            color: {text_p};
+            border: 1px solid {border};
+            border-radius: 8px;
+            padding: 4px;
+        }}
+
+        QMenu::item {{
+            padding: 8px 28px 8px 8px;
+            border-radius: 4px;
+            color: {text_p};
+        }}
+
+        QMenu::item:selected {{
+            background-color: {active_pill};
+            color: {active_pill_text};
+        }}
+
+        QMenu::separator {{
+            height: 1px;
+            background: {border};
+            margin: 4px 8px;
         }}
         """
 

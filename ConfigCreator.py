@@ -5,7 +5,7 @@ import yaml
 
 def create_config(dataset_path=r"Z:\VisionTek\Ultralytics\Ultralytics_YOLO\Datasets", class_names=None, val_ratio=0.2, log_func=print):
     if class_names is None:
-        class_names = ["no"]
+        class_names = ["text"]
 
     train_images_dir = os.path.join(dataset_path, "train", "images")
     train_labels_dir = os.path.join(dataset_path, "train", "labels")

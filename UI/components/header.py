@@ -60,23 +60,6 @@ class GoogleHeaderWidget(QWidget):
         self.avatar_btn.setIconSize(QSize(18, 18))
 
         mode_menu = QMenu(self)
-        mode_menu.setStyleSheet("""
-            QMenu {
-                background-color: #1E1F20;
-                color: #E3E3E3;
-                border: 1px solid #333537;
-                border-radius: 8px;
-                padding: 4px;
-            }
-            QMenu::item {
-                padding: 8px 28px 8px 8px;
-                border-radius: 4px;
-            }
-            QMenu::item:selected {
-                background-color: #282A2C;
-                color: #A8C7FA;
-            }
-        """)
 
         modes = [
             ("CUDA  (NVIDIA GPU)", "0",   "nvidia"),
